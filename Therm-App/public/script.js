@@ -4,6 +4,17 @@ const MAX_VALUE = 15000000;
 // Initial value for the thermometer
 let currentValue = 0;
 
+// Maximum value ever achieved on the thermometer
+let maxAchievedValue = 0;  // Initialize to zero or set to a known maximum value
+// Usage example
+getHighestValue().then(highestValue => {
+  if (highestValue !== null) {
+      maxAchievedValue = highestValue; // Set maxAchievedValue to the fetched value
+      console.log(`The highest value is: ${maxAchievedValue}`); // Use the highest value as needed
+      // You can update the UI or perform other actions with maxAchievedValue here
+  }
+});
+
 // Array to store the log entries
 const logEntries = [];
 
@@ -30,24 +41,41 @@ renderLog();
 
 // Function to render the thermometer
 function renderThermometer() {
-    // Remove all existing fill elements
-    fillElements.forEach((fill) => fill.parentNode.removeChild(fill));
-    fillElements.length = 0;
+  // Remove all existing fill elements and any max line
+  fillElements.forEach((fill) => fill.parentNode.removeChild(fill));
+  fillElements.length = 0;
+  
+  // Remove the max line if it exists
+  const maxLine = document.getElementById('max-line');
+  if (maxLine) {
+      maxLine.remove();
+  }
 
-    let currentHeight = 0;
-    logEntries.forEach((entry, index) => {
-        const fillHeight = (entry.currentAmount / MAX_VALUE) * 200;  // Use currentAmount for the height
-        const newFill = document.createElement('div');
-        newFill.className = 'thermometer-fill';
-        newFill.style.height = `${fillHeight}px`;
-        newFill.style.bottom = `${currentHeight}px`;
-        newFill.style.backgroundColor = colors[index % colors.length];
-        thermometerContainer.appendChild(newFill);
-        fillElements.push(newFill);
-        currentHeight += fillHeight;
-    });
-    updateCurrentTotal(calculateTotal());
+  let currentHeight = 0;
+  logEntries.forEach((entry, index) => {
+      const fillHeight = (entry.currentAmount / MAX_VALUE) * 200;  // Use currentAmount for the height
+      const newFill = document.createElement('div');
+      newFill.className = 'thermometer-fill';
+      newFill.style.height = `${fillHeight}px`;
+      newFill.style.bottom = `${currentHeight}px`;
+      newFill.style.backgroundColor = colors[index % colors.length];
+      thermometerContainer.appendChild(newFill);
+      fillElements.push(newFill);
+      currentHeight += fillHeight;
+  });
+  updateCurrentTotal(calculateTotal());
+  
+  // Add a line for maxAchievedValue, if it's greater than 0
+  if (maxAchievedValue > 0) {
+      const maxLineHeight = (maxAchievedValue / MAX_VALUE) * 200;  // Calculate the height for maxAchievedValue
+      const maxLineElement = document.createElement('div');
+      maxLineElement.className = 'thermometer-line';
+      maxLineElement.id = 'max-line';  // Assign an ID for easy removal
+      maxLineElement.style.bottom = `${maxLineHeight}px`;  // Position it at the height of the maxAchievedValue
+      thermometerContainer.appendChild(maxLineElement);
+  }
 }
+
 
 // Function to render the log entries as a table
 function renderLog() {
@@ -132,6 +160,14 @@ function calculateTotal() {
   return logEntries.reduce((total, entry) => total + entry.currentAmount, 0);
 }
 
+function HighestEver() {
+    if (calculateTotal() > maxAchievedValue) {
+        maxAchievedValue = calculateTotal();
+        saveMaxAchievedValue();  // Call to save the new maxAchievedValue
+    }
+}
+
+
 // Function to update the value, log the change, and render the thermometer and log
 function updateValue(amount, name, reason) {
     if (amount < 0) {
@@ -161,9 +197,11 @@ function updateValue(amount, name, reason) {
         saveLogEntry(logEntries);
     }
 
+    HighestEver();
     renderThermometer();
     renderLog();
     updateCurrentTotal(calculateTotal());
+    
 }
 
 // Function to subtract a negative amount evenly from all existing log entries
@@ -243,6 +281,63 @@ function fetchLogData() {
       })
       .catch(error => console.error('Error fetching log data:', error));
 }
+
+function saveMaxAchievedValue() {
+  // Create the data object with the new maxAchievedValue
+  const data = { highest: maxAchievedValue };
+
+  // Send a POST request to save the new maxAchievedValue
+  fetch('/save-highest', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+  })
+  .then(response => {
+      // Check if the response is okay (status in the range 200-299)
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+      return response.json();  // Parse the JSON from the response
+  })
+  .then(data => {
+      if (data.success) {
+          console.log('Max achieved value saved successfully');
+      } else {
+          console.error('Failed to save max achieved value:', data.message);
+      }
+  })
+  .catch(error => {
+      console.error('Error saving max achieved value:', error);
+  });
+}
+
+// Function to get the highest value
+function getHighestValue() {
+  return fetch('/get-highest') // Call the endpoint
+      .then(response => {
+          if (!response.ok) {
+              throw new Error(`Error: ${response.status} - ${response.statusText}`);
+          }
+          return response.json(); // Parse the JSON response
+      })
+      .then(data => {
+          // Check if the call was successful
+          if (data.success) {
+              return data.highest; // Return the highest value
+          } else {
+              console.error(data.message); // Handle the error message
+              return null; // Return null or an appropriate value in case of error
+          }
+      })
+      .catch(error => {
+          console.error('Failed to fetch highest value:', error); // Handle fetch errors
+          return null; // Return null or an appropriate value in case of fetch error
+      });
+}
+
+
 
 
 // Load data when the page loads

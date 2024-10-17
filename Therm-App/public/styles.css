@@ -102,3 +102,11 @@ button:hover {
   margin-top: 20px; /* Adds some space above the info container */
 }
 
+/* Add this CSS */
+.thermometer-line {
+  position: absolute;
+  width: 100%;
+  height: 2px;  /* Thickness of the line */
+  background-color: green;  /* Line color */
+  left: 0;
+}
