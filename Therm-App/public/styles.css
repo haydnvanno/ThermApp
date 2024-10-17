@@ -1,0 +1,104 @@
+/* General page styling for dark mode */
+body {
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Light text color */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Center the thermometer and add margin to prevent it from touching the sides */
+#thermometer {
+  width: 50px;
+  height: 200px;
+  background-color: #333333; /* Dark gray for the thermometer background */
+  position: relative;
+  border-radius: 25px; /* Rounded thermometer */
+  overflow: hidden; /* Ensures the fill doesn't overflow outside */
+  margin: 20px auto; /* Adds margin and centers the thermometer */
+}
+
+/* Thermometer fill */
+#thermometer-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: #ff5555; /* A slightly lighter red */
+  border-radius: 25px 25px 0 0; /* Rounds the top of the fill */
+}
+
+
+.thermometer-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+/* Input container */
+#input-container {
+  margin-top: 20px;
+  display: flex; /* Enable flexbox */
+  justify-content: center; /* Center the button horizontally */
+}
+
+#input-container button {
+  margin: 0; /* Remove any default margin */
+}
+
+
+#input-form input {
+  margin-right: 10px;
+  background-color: #222222; /* Dark background for inputs */
+  color: #e0e0e0; /* Light text for inputs */
+  border: 1px solid #555555; /* Dark border */
+  padding: 5px;
+}
+
+/* Log container */
+#log-container {
+  margin-top: 20px;
+}
+
+/* Table styling for dark mode */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #555555; /* Darker border */
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #333333; /* Dark background for table header */
+  color: #ffffff; /* Light text color */
+  font-weight: bold;
+}
+
+td {
+  background-color: #222222; /* Dark background for table cells */
+  color: #e0e0e0; /* Light text color */
+}
+
+/* Button styling */
+button {
+  background-color: #444444; /* Darker button background */
+  color: #e0e0e0; /* Light button text */
+  border: 1px solid #555555; /* Dark border */
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #555555; /* Slightly lighter on hover */
+}
+/* Info container styling */
+#info-container {
+  text-align: center; /* Centers the text inside this container */
+  margin-top: 20px; /* Adds some space above the info container */
+}
+
